@@ -224,7 +224,16 @@ app.post('/encontrar',async (req,res)=>{
                                 [req.body.usuario,req.body.usuarioPri]);
     }
      
-    let file = fs.readFileSync(`${rutaRaiz}/chatAll/chat${nomChat[0].idChat}.json`, 'UTF-8')    
+    try{
+        let file = fs.readFileSync(`${rutaRaiz}/chatAll/chat${nomChat[0].idChat}.json`, 'UTF-8')  
+    }catch(e){
+        fs.mkdirSync(`${rutaRaiz}/chatAll/`,{recursive:true});
+        fs.writeFileSync(`${rutaRaiz}/chatAll/chat${nomChat[0].idChat}.json`,'{"principal" :[]}')
+    }
+    
+    
+    // si archivo no existe debe crearlo pero si los datos estan en el otro computador deberia traerlos    
+    
 
     const json1 = JSON.parse(file);
     
@@ -267,7 +276,7 @@ app.post('/enviar',async(req,res)=>{
     }
      
 
-    console.log(nomChat)
+    console.log(nomChat)  
     
     let file = fs.readFileSync(`${rutaRaiz}/chatAll/chat${nomChat[0].idChat}.json`, 'UTF-8')
     

@@ -83,7 +83,7 @@ app.set('view engine', 'ejs');
 
 // 7) ivocar modulo de coneccion base de datos
 
-const server = app.listen(3000, (req,res)=>{
+const server = app.listen(process.env.PORT || 3000, (req,res)=>{
     
 })
 

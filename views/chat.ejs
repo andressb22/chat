@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet"> 
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous"> 
+    <link rel="stylesheet" href="resources/css/chat.css">
+    <title>Chatall chat</title>
+</head>
+<body>
+   <header>
+        <div class="config">
+            <div class='imgUser'>
+                <img src="resources/usuario.jpg" alt="" class=userImg>
+            </div>
+            <div class='userName' >
+              <!--<h3 id="usuario" class="nomUser"><%= username %></h3> --> 
+               <h3 id="usuarioPrueba" class="nomUser"><%= user %></h3>
+            </div>
+        </div>
+        <div class="cont-nombre">
+            <div>
+                <!-- for--> 
+            </div>
+            <div class="cont-title-logo">
+                <div class="cont-logo">
+                    <img src="resources/vector2.png" class="logo" >
+               </div>
+               <div class="cont-title">
+                    <h1>CHATALL</h1>
+                </div>   
+            </div>
+        </div>
+   </header>
+   <div class="cont-pri">
+       <div class="barra-chats">
+            
+            <div class="cont-agregar">
+                <div class="agregar">
+                    <p><a href="/newcontact">Agregar Contacto</a></p>
+                </div>
+                <!--<div class="ico-agregar">
+                    <i class="fas fa-plus"></i> 
+                </div>-->
+            </div>
+            <% for(let i = 0 ; i < contactos.length; i++) {%>
+                <div class='cont-agregar conversaciones'>
+                    <div>
+                        <img src="resources/usuario.jpg"  class='userImg' >
+                    </div>
+                    <div>
+                        <div>
+                            <% if (contactos[i].username2 == user) { %>
+                                <h3> <%= contactos[i].username1%></h3>
+                            <% } else{ %>
+                                <h3> <%= contactos[i].username2%></h3>
+                            <% } %>
+                        </div>
+                        <div>
+                            <p></p>
+                        </div>
+                    </div>
+                </div>  
+            <% }; %>
+            
+       </div>
+       <div class="cont-chat">
+           <div class="chat" id="cont-chat">
+                
+           </div>
+           <div class="barra-chat">
+               <div>
+                    
+               </div>
+               <div >
+                    <input type="text" class="text" placeholder="Escribe algo..." id="barra-escribir">
+                    <!--<input type="submit" value=">">      -->     
+               </div>
+               <div >
+                    <i class="fas fa-laugh iconos-chat"></i>
+                    <i class="fas fa-microphone iconos-chat"></i>
+               </div>
+           </div>
+       </div>
+   </div>
+
+   <% if (contacto) { %>
+
+    <!--verficar que esto funcione con el req.session -->
+    <div class="new-contacto">
+        <div class="cont-title-form">
+            <h2>Nuevo contacto</h2>
+        </div>
+        <form action="/newcontact" method="POST" >
+            
+            <div class="cont-input">
+                <i class="fas fa-user-plus icono-form"></i>
+                <input type="text" placeholder="Nombre usuario" class="input" name="newuser">
+            </div>
+            <div>
+                <input type="submit" value="Agregar contacto" class="boton-form">
+            </div> 
+            
+        </form>
+    <div>
+<% } %>
+<script src="/socket.io/socket.io.js"></script>
+<script src="resources/script/chat.js"></script>
+</body>
+</html>

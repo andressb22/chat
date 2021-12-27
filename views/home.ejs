@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet"> 
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous"> 
+    <link rel="stylesheet" href="resources/css/index.css">
+    <title>Chatall</title>
+</head>
+<body>
+   <header class="menu">
+       <div class= "cont-title-logo">
+           <div class="cont-logo">
+                <img src="resources/vector 2.png" width="72" height="72" class="logo" >
+           </div>
+           <div class="cont-title">
+               <h1>CHATALL</h1>
+           </div>
+       </div>
+       <div>
+            <div class="cont-menu">
+                 <a href="" class="btn-menu" method="post"><i class="fas fa-home"></i> <p>Inicio</p>  </a>
+             </div>
+             <div class="cont-menu">
+                 <a href="" class="btn-menu" id="signup"><i class="fas fa-user"></i> <p>Sign up</p> </a>
+            </div>
+            <div class="cont-menu">
+                <a href="" class="btn-menu" id="login"> <i class="fas fa-sign-in-alt"></i>  <p>Log in</p>  </a>
+            </div>        
+       </div>
+   </header>
+   <div class="cont-principal">
+       <div class="cont-texto">
+            <div class="textoPri">
+                <p>COMUNICATE CON TUS AMIGOS Y CREA MOMENTOS JUNTOS CON CHATALL</p>
+            </div>
+            <div>
+                <button>
+                    Iniciar
+                </button>
+            </div>
+       </div>
+       <div class="cont-img-tel">
+            <div>
+                <img src="resources/celular.png" class="celular">
+                <img src="resources/fond1.jpg" class="fon-celular">
+            </div>
+       </div>
+   </div>
+
+ 
+<div class="space-blank" id="space-blank" >
+    <div class="cont-form">
+        <div class="cont-title-form">
+            <h2>Registrate</h2>
+        </div>
+        <div class="form">
+         <form action="/signin" method="POST" id="form-register" name="signin">
+             <div class="cont-input">
+                    <i class="fas fa-user icono-form" ></i>             
+                  <input type="text" name="nombre" placeholder="Nombre" class="input">
+             </div>
+             <div class="cont-input">
+                    <i class="fas fa-user-plus icono-form"></i>
+                  <input type="text" name="usuario" placeholder="Usuario" class="input">
+              </div>
+              <div class="cont-input">
+                  <i class="fas fa-envelope icono-form"></i>
+                  <input type="email" name="correo" placeholder="Correo" class="input">
+              </div>
+              <div class="cont-input">
+                  <i class="fas fa-lock icono-form"></i>
+                  <input type="password" name="contraseña" placeholder="Contraseña" class="input">
+              </div>
+              <div>
+                <input type="submit"  class="boton-form" value="Registrarse">
+              </div>
+             
+         </form>
+        </div> 
+    </div>
+</div>
+
+
+
+
+<div class="space-blank" id="space-blank1">
+    <div class="cont-form">
+        <div class="cont-title-form">
+            <h2>Iniciar sesion</h2>
+        </div>
+        <div class="form">
+         <form action="/login" method="POST">
+             <div class="cont-input">
+                    <i class="fas fa-user-plus icono-form"></i>
+                  <input type="text" name="username" placeholder="Usuario" class="input">
+              </div>
+              <div class="cont-input">
+                  <i class="fas fa-lock icono-form"></i>
+                  <input type="password" name="password" placeholder="Contraseña" class="input">
+              </div>
+              <div>
+                <input type="submit"  class="boton-form" value="Registrarse">
+              </div> 
+         </form>
+        </div> 
+    </div>
+</div>
+
+
+   <script src="resources/script/home.js"></script>
+
+</body>
+</html>

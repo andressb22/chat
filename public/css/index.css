@@ -1,0 +1,161 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'Raleway', sans-serif;
+    
+}
+body{
+    background: linear-gradient(107.94deg, #A68FFF 0%, rgba(154, 213, 255, 0.796858) 36.63%, rgba(124, 223, 255, 0.433594) 80%, #FFFFFF 100%);
+}
+
+button{
+    font-size: 24px;
+    font-style: italic;
+    color:#310063 ;
+    background:linear-gradient(107.94deg, #A68FFF 0%, rgba(154, 213, 255, 0.796858) 36.63%, rgba(124, 223, 255, 0.433594) 66.96%, #FFFFFF 100%); 
+    border: none;
+    padding: 8px 48px;
+    margin: 7.8%;
+    border-radius: 40px;
+    box-shadow: 0px 5px 7px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+}
+
+
+
+.boton-form{
+    background-color: #310063 ;
+    color:white;
+    font-size: 19px;
+    font-weight: bold;
+    border: none;
+    padding: 12px 35px;
+    border-radius: 40px;
+    margin: 20px 10px 0 50%;
+    cursor: pointer;
+
+}
+.btn-menu{
+    color: #310063;
+    text-decoration: none;
+    font-size: 24px;
+}
+.btn-menu p{
+    display: inline-block;
+    font-weight: bold;
+}
+
+.celular{
+    height: 450px;
+    width: 35vw;
+    transform: rotate(25deg);
+    padding: 0px;
+    padding-left: 23%;
+    filter: drop-shadow(3px 12px 10px rgb(0, 0, 0));
+    
+}
+
+.cont-form{
+    background-color: white;
+    display: inline-block;
+    margin: 4% 31%; 
+    padding: 30px 30px 40px 30px;
+}
+.cont-input{
+    padding: 7px 20px;
+}
+.cont-logo{
+    display: inline-block;
+}
+.cont-menu{
+ display: inline-block;
+ 
+ padding: 20px;
+}
+.cont-texto{
+    text-align: center;
+    padding: 12% 5%;
+}
+.cont-title{
+    display: inline-block;
+    height: 100%;
+    padding-top: 15px;
+    color: #310063;
+    
+}
+.cont-title-form{
+    font-size: 35px;
+    font-weight: bold;
+    color:#310063 ;
+    text-align: center;
+    padding: 6px;
+}
+.cont-title-logo{
+    display: grid;
+    grid-template-columns: 95px 1fr;
+}
+
+.cont-principal{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+.fon-celular{  
+    height: 400px;
+    width: 14vw;
+    transform: rotate(25deg);
+    padding: 30px;
+    padding-left: 9%;      
+    position: absolute;
+    left: 63%;
+    top:80px;  
+    z-index: -3;
+
+}
+.icono-form{
+    position: relative;
+    color: #6A00AB;
+    font-size: 24px;
+    top:30px;
+    left:86%;
+}
+.input{
+    width: 28vw;
+    height: 35px;
+    border: none;
+    border-bottom: 2px solid #6A00AB;
+    font-size: 18px;
+    padding-left: 8px;
+}
+.logo{
+    padding: 12px;
+    padding-top: 10px;
+    width: 80px;
+    height: 40px;
+}
+
+.textoPri{
+    font-size: 50px;
+    color: #310063;
+    font-weight: 900;
+    
+}
+.menu{
+    height: 74px;
+    display: grid;
+    grid-template-columns: 2fr 1fr;      
+}
+.space-blank{
+    
+    position: absolute;
+    display: inline-block;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.562);
+    top: 0;
+    left: 0;
+    z-index: -30;
+    opacity: 0;
+}
+
+
+

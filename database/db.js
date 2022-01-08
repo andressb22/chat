@@ -1,10 +1,30 @@
-const mysql = require("mysql")
+const {Client} = require('pg');
+
+const pool = new Client({
+    user:'osymhlsoanyfxl',
+    host:'ec2-54-80-70-66.compute-1.amazonaws.com',
+    database:'d2j39v6dqj9r0g',
+    password:'917aee8c9aa24d724025e6ca49471eebe6e5ada685ab6228bc34dffa440bc036',
+    port: '5432',
+    ssl:{
+        rejectUnauthorized:false,
+    }
+});
+
+const activatedb = async ()=>{
+    await pool.connect();
+}
+activatedb();
+
+module.exports = pool;
+
+/*const mysql = require("mysql")
 const {promisify} = require('util');
 const database = {
-    /*host:'localhost',
+    host:'localhost',
     user:'root',
     pasword:'pasword12',
-    database:'chatall'*/
+    database:'chatall'
     host:'ec2-54-80-70-66.compute-1.amazonaws.com',
     port: '5432',
     user:'osymhlsoanyfxl',
@@ -32,6 +52,5 @@ pool.getConnection((err,connection) =>{
     return;
 });
 
-pool.query = promisify(pool.query);
+pool.query = promisify(pool.query);*/
 
-module.exports = pool;

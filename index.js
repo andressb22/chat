@@ -20,6 +20,12 @@ let usuarioPrincipal ;
 
 const app = express();
 
+const prueba = async ()=>{
+   const pruebita = await pool.query("select * from usuarios")
+   console.log(pruebita.rows)
+}
+
+prueba()
 //2) urlencoded es para capturar los datos del formulario y asi evitar errores
 
 app.use(express.urlencoded({extended:true}));
@@ -40,14 +46,14 @@ passport.use(new passportLocal(async function(username,password,done){
     const usuarios = await pool.query('SELECT * FROM usuarios WHERE username = ?' , [username])
 
     session.datos = {
-        username :usuarios[0].username,
-        fullname : usuarios[0].fullname
+        username :usuarios.rows[0].username,
+        fullname : usuarios.rows[0].fullname
     }
 
     usuarioPrincipal = usuarios
-    if(usuarios[0].password == password)
+    if(usuarios.rows[0].password == password)
     {
-       return  done(null,usuarios[0])
+       return  done(null,usuarios.rows[0])
     }
 
     done(null,false)

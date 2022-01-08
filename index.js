@@ -77,62 +77,155 @@ app.use('/resources', express.static(__dirname + '/public'))
 //5) - Establecer el motor de plantillas
 app.set('view engine', 'ejs');
 
-//6) - configurar express-session
 
-
-
-// 7) ivocar modulo de coneccion base de datos
-
-const server = app.listen(process.env.PORT || 3000, (req,res)=>{
-    
-})
+const server = app.listen(process.env.PORT || 3000, (req,res)=>{})
 
 const io = soketIO(server);
-let clients = io.sockets.client;
 
-io.on('connection',(socket)=>{
+io.on('connection',async (socket)=>{
+
+    socket.on('datos:server',async(data)=>{
+           
+            // verificar por que carga un undefined si el change ya esta en 0 ;
+            
+            for(let i = 0; i < data.amigos.length; i++){
+                 
+                let nomChat;
+
+                nomChat = await pool.query('SELECT * FROM contactos WHERE username1 = ? and username2 = ?', 
+                                    [data.user,data.amigos[i]])
+                
+    
+                if(nomChat.length == 0){
+
+                    nomChat = await pool.query('SELECT * FROM contactos WHERE username1 = ? and username2 = ?', 
+                                        [data.amigos[i],data.user]);
+
+                    let data1 = JSON.stringify(nomChat[0].change2);
+                    let data2 = JSON.parse(data1)
+                    if(data2.data[0] == 1){
+
+                        let message = JSON.parse(JSON.stringify(nomChat[0].message2))
+                        let file = fs.readFileSync(`${rutaRaiz}/chatAll/chat${nomChat[0].idChat}.json`, 'UTF-8')
+    
+                        const json = JSON.parse(file);
+                        json.principal.push(message);
+
+                        file = fs.writeFileSync(`${rutaRaiz}/chatAll/chat${nomChat[0].idChat}.json`, JSON.stringify(json));
+
+                        await pool.query('UPDATE contactos SET change2 = ? , message2 = ? WHERE username1 = ? AND username2 = ? ',
+                                         [0,"",data.amigos[i],data.user])
+                     }
+                     
+                }else{
+
+                    let data1 = JSON.stringify(nomChat[0].change1);
+                    let data2 = JSON.parse(data1)
+                    if(data2.data[0] == 1){
+
+                        let message = JSON.parse(JSON.stringify(nomChat[0].message2))
+                        let file = fs.readFileSync(`${rutaRaiz}/chatAll/chat${nomChat[0].idChat}.json`, 'UTF-8')
+    
+                        const json = JSON.parse(file);
+                        json.principal.push(message);
+
+                        file = fs.writeFileSync(`${rutaRaiz}/chatAll/chat${nomChat[0].idChat}.json`, JSON.stringify(json));
+
+                        await pool.query('UPDATE contactos SET change1 = ? , message1 = ? WHERE username1 = ? AND username2 = ? ',
+                                         [0,"",data.user,data.amigos[i]])
+                        console.log(message);
+                     }
+                }
+                                                   
+            }
+            
+            // verifico si hay mensaje nuevos 
+            // y  actualizo en el json de  mi computadora 
+            // por ultimo actualizar la barra lateral 
+    })
+
+    socket.on('guardar', async (data)=>{
+        console.log("guarda datos")
+        console.log(data) 
+        let nomChat;
+        nomChat = await pool.query('SELECT * FROM contactos WHERE username1 = ? and username2 = ?', 
+                                [data.usuario,data.usuario2])
+
+        if(nomChat.length == 0){
+            nomChat = await pool.query('SELECT * FROM contactos WHERE username1 = ? and username2 = ?', 
+                                [data.usuario2,data.usuario]);
+        }
+
+        let file = fs.readFileSync(`${rutaRaiz}/chatAll/chat${nomChat[0].idChat}.json`, 'UTF-8')
+    
+        const json = JSON.parse(file);
+        json.principal.push({'usuario': data.usuario, 'texto': data.texto,'fecha':'3:00','direccion':data.direccion});
+        
+        file = fs.writeFileSync(`${rutaRaiz}/chatAll/chat${nomChat[0].idChat}.json`, JSON.stringify(json));
+    })
+
+    socket.on('enviar', async (data1)=>{          
+
+        let texto;
+        console.log(data1)
+
+        if(clientes[data1.usuario2] == undefined){
+            console.log("usuario no conectado ")
+
+            let contactos = await pool.query('SELECT * FROM contactos WHERE username1 = ? and username2 = ?', 
+                                                    [data1.usuario, data1.usuario2])
+                                                   
+            if(contactos.length == 0){
+                contactos = await pool.query('SELECT * FROM contactos WHERE username1 = ? and username2 = ?', 
+                                                    [data1.usuario, data1.usuario2])
+            }
+            
+            if(contactos[0].username1 == data1.usuario ){  
+
+                texto = contactos[0].message2
+                texto += `{'usuario': ${data1.usuario2}, 'texto': ${data1.texto},'fecha':'3:00','direccion':1}`
+                await pool.query('UPDATE contactos SET change2 = ? , message2 = ? WHERE username1 = ? AND username2 = ? ',
+                                    [1,texto,data1.usuario, data1.usuario2])
+            }
+            else{
+
+                texto = contactos[0].message1
+                texto += `{'usuario': ${data1.usuario2}, 'texto': ${data1.texto},'fecha':'3:00','direccion':1}`
+                await pool.query('UPDATE contactos SET change1 = ? , message1 = ? WHERE username1 = ? AND username2 = ? ',
+                                    [1,texto,data1.usuario, data1.usuario2])
+            }
+                            // cuando el usuario no esta conectado simplemente debe  guardar los datos en la base de datos 
+                            //ademas de esto  planear un escuchador que apenas ingrese verifique los datos 
+        }
+        else{
+
+            clientes[data1.usuario2].sockets.emit('enviar:user', {data1})
+        }
+            
+    })
+
+    socket.on("disconnect", (reason) => {  
+         console.log(`disconnect ${socket.id} due to ${reason}`); 
+
+         let usuarios = Object.keys(clientes)
+
+         for(let i=0; i< usuarios.length; i++){
+
+            let usuario = usuarios[i];
+
+            if(socket.id == clientes[usuario].id){
+
+                delete clientes[usuario];
+            }
+          }
+    })
+    
     const id = socket.id;
     clientes[session.datos.username] = {
 
                         id:id,
                         sockets:socket
-                    };
-
-    
-
-    socket.on('sala', (data) => {
-        
-        if(clientes[data.user] == undefined){
-            console.log("usuario no conectado ")
-            // cuando el usuario no esta conectado simplemente debe  guardar los datos en la base de datos 
-            //ademas de esto  planear un escuchador que apenas ingrese verifique los datos 
-        }
-        else{
-            //aqui meterlos a la misma "sala"
-            // cliente que envia los datos 
-
-            // no encuentras los datos por que la session se actualiza y no permite encontrar el dato por medio de este
-            //usar la base de datos para encontar el archivo preferiblemente
-            socket.on('enviar', (data1)=>{
-                //recivir y organizar esos datos 
-                //mandarlos al otro cliente
-                console.log(data1)
-    
-                clientes[data1.usuario2].sockets.emit('enviar:user', {data1})
-            })
-            
-            //este socket entra al usuario1
-            
-
-            //emitir un evento para el USUARIO  para actualizar sus datos
-            //pero no los va a mostar a exepcio de el chat que se encuente abierto por lo cual apenas lleguen estos datos
-            //hara un render en la pantalla paralela 
-        }
-        // verificar si el usuario se encuentra activo 
-        // si se encuenta activo     unirlo a la sala  y hacer el renderisado de datos
-        // si no guardar los mennsajes en la base de datos  
-        //console.log("datos de sala" + data)
-    })
+                    };   
 })
 
 
@@ -215,6 +308,7 @@ app.post('/login',passport.authenticate('local',{
 app.post('/encontrar',async (req,res)=>{
 
     let nomChat;
+    let file;
 
     nomChat = await pool.query('SELECT * FROM contactos WHERE username1 = ? and username2 = ?', 
                                 [req.body.usuarioPri,req.body.usuario])
@@ -225,7 +319,7 @@ app.post('/encontrar',async (req,res)=>{
     }
      
     try{
-        let file = fs.readFileSync(`${rutaRaiz}/chatAll/chat${nomChat[0].idChat}.json`, 'UTF-8')  
+         file = fs.readFileSync(`${rutaRaiz}/chatAll/chat${nomChat[0].idChat}.json`, 'UTF-8')  
     }catch(e){
         fs.mkdirSync(`${rutaRaiz}/chatAll/`,{recursive:true});
         fs.writeFileSync(`${rutaRaiz}/chatAll/chat${nomChat[0].idChat}.json`,'{"principal" :[]}')
@@ -243,6 +337,7 @@ app.post('/encontrar',async (req,res)=>{
 app.post('/enviar',async(req,res)=>{
 
     let nomChat;
+    let direccion = "1";
     // desorden muy grande revisar el metodo enviar para cambiarl la forma en la que llega la info
     // es necesario crear la ruta del archivo para que pueda acceder de manera correcta
     // y si manda los datos pero no los renderiza 
@@ -274,14 +369,15 @@ app.post('/enviar',async(req,res)=>{
         nomChat = await pool.query('SELECT * FROM contactos WHERE username1 = ? and username2 = ?', 
                                 [req.body.usuario,req.body.usuarioPri]);
     }
-     
 
-    console.log(nomChat)  
+    if(req.body.direccion == 1){
+         direccion = "0";
+    }
     
     let file = fs.readFileSync(`${rutaRaiz}/chatAll/chat${nomChat[0].idChat}.json`, 'UTF-8')
     
     const json = JSON.parse(file);
-    json.principal.push({'usuario': req.body.usuarioPri, 'texto': req.body.texto,'fecha':'3:00','direccion':'1'});
+    json.principal.push({'usuario': req.body.usuarioPri, 'texto': req.body.texto,'fecha':'3:00','direccion':direccion});
 
     file = fs.writeFileSync(`${rutaRaiz}/chatAll/chat${req.body.usuarioPri}${req.body.usuario}.json`, JSON.stringify(json));
     

@@ -3,23 +3,27 @@ const conversaciones = document.getElementsByClassName('conversaciones')
 const usuario = document.querySelector('#usuario');
 const usuarioPri = document.querySelector('#usuarioPrueba').textContent
 const contChat = document.querySelector('#cont-chat');
+const contenedorChat = document.querySelector('#cont-chat');
 const socket = io();
 let usuario2 ;
+let amigos = []
 
-for(let i = 0; i < conversaciones.length; i++){
+
+for(let i = 0; i < conversaciones.length; i++){ 
+    
+    amigos.push(conversaciones[i].children[1].children[0].textContent.trim())
     conversaciones[i].addEventListener("click",chats)
 }
-
-
+console.log(amigos)
+socket.emit("datos:server",{amigos:amigos,user:usuarioPri})
 
 function chats(e){
     let nomPerso = e.target
-    let nomusuario = this.textContent.trim()
+    let nomusuario = this.children[1].children[0].textContent.trim()
     usuario2 = nomusuario
     console.log(usuarioPri)
-    
+    contChat.innerHTML = "";
 
-    socket.emit('sala', {user: usuario2})
 
         fetch('/encontrar', {
             method:'POST',
@@ -56,12 +60,15 @@ function chats(e){
 
                 parrafoTexto.textContent += elements.texto
             })
+            console.log(contChat)
+            console.log(contChat.innerHTML)
             
+            contenedorChat.scrollTop = contenedorChat.scrollHeight;
         });
     
 }
 
-socket.on('enviar:user',(data)=>{
+socket.on('enviar:user',async (data)=>{
     
     //verficar si solo debo pasarle data
     console.log(data.data1.usuario)
@@ -69,15 +76,25 @@ socket.on('enviar:user',(data)=>{
     
     if( usuario2 == data.data1.usuario){
         
-        fethEnviar(data.data1.texto)
-        // aqui si mandar el fetch de enviar y actualizar
+        await fethEnviar(data.data1.texto,1)
+        contenedorChat.scrollTop = contenedorChat.scrollHeight;
     }
-    else if(usuario2 == null || usuario2 != data.usuario){
+    else if(usuario2 == null || usuario2 != data.usuario || usuario2 == undefined){
+        
+        for(let i = 0;  i < conversaciones.length ; i ++){
 
-        //ponemos el ultimo mensaje enviado en la parte izquierda y guardamos los datos en el json 
+            let nameUser = conversaciones[i].children[1].children[0].textContent.trim() 
+
+            if(nameUser == data.data1.usuario){
+
+               conversaciones[i].children[1].children[1].children[0].innerText = data.data1.texto;
+            }
+        }
+        // save dates in json 
+        socket.emit('guardar', data.data1)
+        // estilizar mejor eso  
     }
 
-    //fethEnviar(data)
 })
 
 async function enviar(e){
@@ -87,14 +104,17 @@ async function enviar(e){
     if(e.charCode == "13"){
         
         let data  = await fethEnviar(chat.value)
-        console.log(data)
+        
         data.usuario2 = usuario2
+        console.log(data)
         socket.emit('enviar', data)   
+        chat.value = ""; 
+        contenedorChat.scrollTop = contenedorChat.scrollHeight;
     }
 }
 
 
-async function fethEnviar(texto){
+async function fethEnviar(texto, direccion = undefined){
     let message ;
     await fetch('/enviar', {
         method:'POST',
@@ -103,12 +123,16 @@ async function fethEnviar(texto){
         },
         body: JSON.stringify({usuario:usuario2,
                               texto:texto,
-                              usuarioPri:usuarioPri
+                              usuarioPri:usuarioPri,
+                              direccion : direccion
                              })
     })
      .then(res =>{return res.json()})
      .then(data =>{
         console.log(data)
+        if(direccion == 1){
+            data.direccion = '0';
+        }
         //let tamaño = data.principal.length
         let contenedor = document.createElement('div');
         let contenedorTexto = document.createElement('div');
@@ -116,7 +140,7 @@ async function fethEnviar(texto){
         let parrafoTexto = document.createElement('p');
         let parrafoFecha = document.createElement('p');
         
-
+        console.log(data.direccion)
         if(data.direccion == "0"){
             contenedor.setAttribute('class','cont-mensaje-left')   
         }

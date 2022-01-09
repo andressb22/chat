@@ -166,6 +166,6 @@ chat.addEventListener("focus",(e) =>{
 
 chat.addEventListener('focusout', ()=>{
     // revisar esto por  que aqui deberia eliminar el listener
-    alert("sale del focus");
+    chat.removeEventListener("keypess",enviar)
 })
 

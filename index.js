@@ -318,6 +318,7 @@ app.post('/encontrar',async (req,res)=>{
 
     let nomChat;
     let file;
+    rutaRaiz = os.homedir();
 
     nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${req.body.usuarioPri}' and
                                  username2 = '${req.body.usuario}'`)

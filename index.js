@@ -265,7 +265,8 @@ app.get('/chat',async (req,res,next)=>{
                         'username': session.datos.fullname,
                         'user':session.datos.username,
                         'contacto':false,
-                        'contactos':contactos.rows
+                        'contactos':contactos.rows,
+                        'ruta': os.homedir
                       })
     
 })

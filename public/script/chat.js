@@ -7,7 +7,7 @@ const contenedorChat = document.querySelector('#cont-chat');
 const socket = io();
 let usuario2 ;
 let amigos = []
-console.log(window.parent);
+console.log(window.self);
 
 for(let i = 0; i < conversaciones.length; i++){ 
     

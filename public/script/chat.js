@@ -7,7 +7,7 @@ const contenedorChat = document.querySelector('#cont-chat');
 const socket = io();
 let usuario2 ;
 let amigos = []
-
+console.log(window.parent);
 
 for(let i = 0; i < conversaciones.length; i++){ 
     
@@ -18,6 +18,7 @@ console.log(amigos)
 socket.emit("datos:server",{amigos:amigos,user:usuarioPri})
 
 function chats(e){
+    
     let nomPerso = e.target
     let nomusuario = this.children[1].children[0].textContent.trim()
     usuario2 = nomusuario

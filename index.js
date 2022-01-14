@@ -8,20 +8,16 @@ const pool = require('./database/db');
 const express = require('express');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
-
 const passportLocal = require('passport-local').Strategy
 const fs = require('fs');
-const os = require('os')
 
 const clientes = {};
-let rutaRaiz = os.homedir();
 let usuarioPrincipal ;
-// coneccion archivo base de datos 
+let fecha = new Date;
 
 const app = express();
 
 
-//2) urlencoded es para capturar los datos del formulario y asi evitar errores
 
 app.use(express.urlencoded({extended:true}));
 
@@ -74,6 +70,7 @@ dotenv.config({path:'./env/.env'});
 //4 crear la carpeta de archivos estaticos o public
 // express.static se usa para definir la carpera donde estaran los archivos estaticos
 // y app.use es para invocar esa carpeta atraves de el nombre que esta puesto a modo de url
+
 app.use('/resources', express.static('public'))
 app.use('/resources', express.static(__dirname + '/public'))
 
@@ -89,37 +86,28 @@ io.on('connection',async (socket)=>{
 
     socket.on('datos:server',async(data)=>{
            
-            // verificar por que carga un undefined si el change ya esta en 0 ;
-
-           
-            
-            for(let i = 0; i < data.amigos.length; i++){
+        for(let i = 0; i < data.amigos.length; i++){
                  
-                let nomChat;
+            let nomChat;
 
-                nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data.user}' and 
+            nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data.user}' and 
                                             username2 = '${data.amigos[i]}'`)
                 
-                if(nomChat.rows.length == 0){
+            if(nomChat.rows.length == 0){
 
-                    nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data.amigos[i]}' and 
+                nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data.amigos[i]}' and 
                                                username2 = '${data.user}'`);
 
-                    let data1 = JSON.stringify(nomChat.rows[0].change2);
-                    data1 = parseInt(data1)
+                let data1 = JSON.stringify(nomChat.rows[0].change2);
+                data1 = parseInt(data1)
 
-                    if(data1 == 1){
+                if(data1 == 1){
 
-                        let message = JSON.parse(JSON.stringify(nomChat.rows[0].message2))
-                        let file = fs.readFileSync(`${rutaRaiz}/chatAll/chat${nomChat.rows[0].idChat}.json`, 'UTF-8')
-    
-                        const json = JSON.parse(file);
-                        json.principal.push(message);
+                    let message = JSON.parse(JSON.stringify(nomChat.rows[0].message2))
+                    json.principal.push(message);
 
-                        file = fs.writeFileSync(`${rutaRaiz}/chatAll/chat${nomChat.rows[0].idChat}.json`, JSON.stringify(json));
-
-                        await pool.query(`UPDATE contactos SET change2 = '${0}' , message2 = ' ' WHERE
-                                         username1 = '${data.amigos[i]}' AND username2 = '${data.user}'`)
+                    await pool.query(`UPDATE contactos SET change2 = '${0}' , message2 = ' ' WHERE
+                                     username1 = '${data.amigos[i]}' AND username2 = '${data.user}'`)
                      }
                      
                 }else{
@@ -130,16 +118,10 @@ io.on('connection',async (socket)=>{
                     if(data1 == 1){
 
                         let message = JSON.parse(JSON.stringify(nomChat.rows[0].message2))
-                        let file = fs.readFileSync(`${rutaRaiz}/chatAll/chat${nomChat.rows[0].idChat}.json`, 'UTF-8')
-    
-                        const json = JSON.parse(file);
                         json.principal.push(message);
-
-                        file = fs.writeFileSync(`${rutaRaiz}/chatAll/chat${nomChat.rows[0].idChat}.json`, JSON.stringify(json));
 
                         await pool.query(`UPDATE contactos SET change1 = '${0}' , message1 = ' ' WHERE 
                                         username1 = '${data.user}' AND username2 = '${data.amigos[i]}'`)
-                        console.log(message);
                      }
                 }
                                                    
@@ -150,29 +132,11 @@ io.on('connection',async (socket)=>{
             // por ultimo actualizar la barra lateral 
     })
 
-    socket.on('guardar', async (data)=>{
-      
-        let nomChat;
-        nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data.usuario}' and 
-                                    username2 = '${data.usuario2}'`)
-
-        if(nomChat.rows.length == 0){
-            nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data.usuario2}' and 
-                                        username2 = '${data.usuario}'`);
-        }
-
-        let file = fs.readFileSync(`${rutaRaiz}/chatAll/chat${nomChat.rows[0].idchat}.json`, 'UTF-8')
     
-        const json = JSON.parse(file);
-        json.principal.push({'usuario': data.usuario, 'texto': data.texto,'fecha':'3:00','direccion':data.direccion});
-        
-        file = fs.writeFileSync(`${rutaRaiz}/chatAll/chat${nomChat.rows[0].idchat}.json`, JSON.stringify(json));
-    })
 
     socket.on('enviar', async (data1)=>{          
 
         let texto;
-        console.log(data1)
 
         if(clientes[data1.usuario2] == undefined){
             console.log("usuario no conectado ")
@@ -188,7 +152,7 @@ io.on('connection',async (socket)=>{
             if(contactos.rows[0].username1 == data1.usuario ){  
             
                 texto = contactos.rows[0].message2
-                texto += `{"usuario": ${data1.usuario2}, "texto": ${data1.texto},"fecha":"3:00","direccion":1}`
+                texto += `{"usuario": ${data1.usuario}, "texto": ${data1.texto},"fecha":"${fecha.getHours()}"}`
 
                 await pool.query(`UPDATE contactos SET change2 = '1' , message2 = '${texto}' WHERE 
                                   username1 = '${data1.usuario}'  AND username2 = '${data1.usuario2}'`)
@@ -196,7 +160,7 @@ io.on('connection',async (socket)=>{
             else{
                 
                 texto = contactos.rows[0].message1
-                texto += `{"usuario": ${data1.usuario2}, "texto": ${data1.texto},"fecha":"3:00","direccion":1}`
+                texto += `{"usuario": ${data1.usuario}, "texto": ${data1.texto},"fecha":"${fecha.getHours()}"}`
                 await pool.query(`UPDATE contactos SET change1 = '1' , message1 = '${texto}' WHERE 
                                   username1 = '${data1.usuario}' AND username2 = '${data1.usuario2}'`)
                 
@@ -246,6 +210,7 @@ app.get('/',(req,res)=>{
 
 app.get('/chat',async (req,res,next)=>{
 
+
     if(req.isAuthenticated()){
         return next()
     }
@@ -265,8 +230,8 @@ app.get('/chat',async (req,res,next)=>{
                         'username': session.datos.fullname,
                         'user':session.datos.username,
                         'contacto':false,
-                        'contactos':contactos.rows,
-                        'ruta': os.arch()
+                        'contactos':contactos.rows
+                        
                       })
     
 })
@@ -280,13 +245,8 @@ app.post('/newcontact',async (req,res)=>{
     let coverchat ;
 
     const contacto = await pool.query(`SELECT * FROM usuarios WHERE username = '${contact}'`)
-  
-    fs.mkdirSync(`${rutaRaiz}/chatAll/`,{recursive:true});
-
-    fs.writeFileSync(`${rutaRaiz}/chatAll/chat${session.datos.username}${contacto.rows[0].username}.json`,'{"principal" :[]}')
-
     coverchat =`${session.datos.username}${contacto.rows[0].username}`;
-    // arreglar esto hoyy
+
     await pool.query(`INSERT INTO contactos (username1, username2,idChat,change1,change2,message1,message2) values
                     ('${session.datos.username}','${contacto.rows[0].username}','${coverchat}','0','0',' ',' ')`)
     
@@ -318,8 +278,6 @@ app.post('/login',passport.authenticate('local',{
 app.post('/encontrar',async (req,res)=>{
 
     let nomChat;
-    let file;
-    rutaRaiz = os.homedir();
 
     nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${req.body.usuarioPri}' and
                                  username2 = '${req.body.usuario}'`)
@@ -329,51 +287,15 @@ app.post('/encontrar',async (req,res)=>{
                                     username2 = '${req.body.usuarioPri}'`);
     }
      
-    try{
-         file = fs.readFileSync(`${rutaRaiz}/chatAll/chat${nomChat.rows[0].idchat}.json`, 'UTF-8')  
-    }catch(e){
-        console.log("entra en error")
-        fs.mkdirSync(`${rutaRaiz}/chatAll/`,{recursive:true});
-        fs.writeFileSync(`${rutaRaiz}/chatAll/chat${nomChat.rows[0].idchat}.json`,'{"principal" :[]}')
-        file = '{"principal" :[]}';
-    }
+    let id = {"idchat":nomChat.rows[0].idchat}
     
-    // si archivo no existe debe crearlo pero si los datos estan en el otro computador deberia traerlos    
-    
-
-    const json1 = JSON.parse(file);
-    
-    return res.send(json1)
+    return res.send(id)
 })
 
 app.post('/enviar',async(req,res)=>{
 
     let nomChat;
-    let direccion = "1";
-    // desorden muy grande revisar el metodo enviar para cambiarl la forma en la que llega la info
-    // es necesario crear la ruta del archivo para que pueda acceder de manera correcta
-    // y si manda los datos pero no los renderiza 
-
-   /* let contactos = await pool.query('SELECT * FROM contactos WHERE username1 = ? and username2 = ?', 
-                                        [req.body.usuarioPri,req.body.usuario])
-
-
-    if(contactos[0].username1 == undefined){
-         contactos = await pool.query('SELECT * FROM contactos WHERE username1 = ? and username2 = ?', 
-                                        [req.body.usuario, req.body.usuarioPri])
-    }
-
-
-    if(contactos[0].username1 == req.body.usuarioPri )
-    {  
-        await pool.query('UPDATE contactos SET change2 = ? , message2 = ? WHERE username1 = ? AND username2 = ? ',
-                        [1,req.body.texto,req.body.usuarioPri, req.body.usuario])
-    }
-    else
-    {
-        await pool.query('UPDATE contactos SET change2 = ? , message2 = ? WHERE username1 = ? AND username2 = ? ',
-                        [1,req.body.texto,req.body.usuario , req.body.usuarioPri])
-    }*/
+    
     nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${req.body.usuarioPri}' and
                                username2 = '${req.body.usuario}'`)
 
@@ -382,17 +304,9 @@ app.post('/enviar',async(req,res)=>{
                                    username2 = '${req.body.usuarioPri}'`);
     }
 
-    if(req.body.direccion == 1){
-         direccion = "0";
-    }
-
-    let file = fs.readFileSync(`${rutaRaiz}/chatAll/chat${nomChat.rows[0].idChat}.json`, 'UTF-8')
-    console.log(file);
-    const json = JSON.parse(file);
-    json.principal.push({'usuario': req.body.usuarioPri, 'texto': req.body.texto,'fecha':'3:00','direccion':direccion});
-
-    file = fs.writeFileSync(`${rutaRaiz}/chatAll/chat${req.body.usuarioPri}${req.body.usuario}.json`, JSON.stringify(json));
-    
-    return res.send({'usuario': req.body.usuarioPri, 'texto': req.body.texto,'fecha':'3:00','direccion':'1'})
+    let id = {"idchat":nomChat.rows[0].idchat,
+              "texto":req.body.texto,
+              }
+    return res.send(id)
 })
 

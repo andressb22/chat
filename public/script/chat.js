@@ -1,4 +1,5 @@
 window.addEventListener("load", (e)=>{
+    
     const chat = document.querySelector('#barra-escribir');
     const conversaciones = document.getElementsByClassName('conversaciones')
     const usuario = document.querySelector('#usuario');
@@ -11,6 +12,7 @@ window.addEventListener("load", (e)=>{
     let db ;
     let solicitudConexion = indexedDB.open('contactosdb',2);
     let fecha = new Date;
+
     solicitudConexion.onsuccess = (e)=>{
         db = e.target.result;
     }
@@ -33,40 +35,69 @@ window.addEventListener("load", (e)=>{
 
 
     socket.emit("datos:server",{amigos:amigos,user:usuarioPri})
-
+    
     socket.on('guardar:dbLocal',(data)=>{
         let transaccion = db.transaction(['contactos1'],'readwrite')
-            let  notas = transaccion.objectStore('contactos1')
+        let  notas = transaccion.objectStore('contactos1')
              
-            let chatSelecionado =  notas.get(data.idchat)
+        let chatSelecionado =  notas.get(data.idchat)
 
-               chatSelecionado.onsuccess =   (e)=>{
-                let messages = chatSelecionado.result
 
-                let arregloMensajes = data.message.split(";")
-                console.log(arregloMensajes)
-               arregloMensajes.map(elements =>{
+         chatSelecionado.onsuccess =   (e)=>{
+            let messages = chatSelecionado.result
+            if(messages == undefined){
+  
+                let chat = {
+                    idChat : data.idchat,
+                    contenido:[]      
+                        }
+                
+                let agregarDatosdb = notas.add(chat,data.idchat)
 
-                   let mensajeTexto = elements
-                    
-                    if(mensajeTexto.length != 0){
-                        mensajeTexto = JSON.parse(mensajeTexto);
-                        messages.contenido.push(mensajeTexto);     
+                agregarDatosdb.onsuccess = (e)=>{
+                    let rescatarDatos =  notas.get(data.idchat)
+
+                    rescatarDatos.onsuccess =   (e)=>{
+
+                        let mensajeRescatado = rescatarDatos.result
+                        let RescatarArregloMensajes = data.message.split(";")
+                        RescatarArregloMensajes.map(elements =>{
+
+                            let mensajeTexto = elements
+                         
+                            if(mensajeTexto.length != 0){
+                                mensajeTexto = JSON.parse(mensajeTexto);
+                                mensajeRescatado.contenido.push(mensajeTexto);         
+                            }                                  
+                        }) 
+
+                        notas.put(mensajeRescatado,data.idchat)
                     }
-
-                    let enviarMensaje =  notas.put(messages,data.idchat)
-                    enviarMensaje.onsuccess = (e)=>{ }
-                             
-               })         
+                }             
             }
+            else{
+                let arregloMensajes = data.message.split(";")
+                arregloMensajes.map(elements =>{
+
+                    let mensajeTexto = elements
+                         
+                    if(mensajeTexto.length != 0){
+
+                        mensajeTexto = JSON.parse(mensajeTexto);
+                        messages.contenido.push(mensajeTexto);         
+                    }
+     
+                     notas.put(messages,data.idchat)
+                                  
+                }) 
+            }          
+        }
     })
 
     function chats(e){
         
-        let nomPerso = e.target
         let nomusuario = this.children[1].children[0].textContent.trim()
         usuario2 = nomusuario
-        console.log(usuarioPri)
         contChat.innerHTML = "";
 
 
@@ -83,8 +114,6 @@ window.addEventListener("load", (e)=>{
             }).then(res =>{return res.json()})
             .then(data =>{   
                 
-                // el resultado no lo muestra si no que busca los datos en la base de datos
-                // del navegador y  hay si recorrelos y mostrarlos 
                 let transaccion = db.transaction(['contactos1'],'readwrite')
                 let  notas = transaccion.objectStore('contactos1')
 
@@ -93,12 +122,9 @@ window.addEventListener("load", (e)=>{
                 prueba.onsuccess = function(e){
                     let data1 = prueba.result
                     if(data1 != undefined){
-                        console.log(data1)
-                        console.log(data1)
 
                         data1.contenido.map(elements =>{
 
-                            console.log(elements)
                         let contenedor = document.createElement('div');
                         let contenedorTexto = document.createElement('div');
                         let contenedorFecha = document.createElement('div');
@@ -141,10 +167,6 @@ window.addEventListener("load", (e)=>{
     }
 
     socket.on('enviar:user',async (data)=>{
-        
-        //verficar si solo debo pasarle data
-        console.log(data.data1.usuario)
-        console.log(usuario2)
         
         if( usuario2 == data.data1.usuario){
             
@@ -206,8 +228,7 @@ window.addEventListener("load", (e)=>{
         })
         .then(res =>{return res.json()})
         .then(async (data) =>{
-            console.log(data)
-            
+
             let transaccion = db.transaction(['contactos1'],'readwrite')
             let  notas = transaccion.objectStore('contactos1')
              
@@ -216,7 +237,6 @@ window.addEventListener("load", (e)=>{
                chatSelecionado.onsuccess =   (e)=>{
                 let messages = chatSelecionado.result
 
-                console.log(messages);
                 let mensajeaGuardar = {
                     texto:data.texto,
                     fecha:fecha.getHours(),
@@ -224,7 +244,6 @@ window.addEventListener("load", (e)=>{
                 }
                 messages.contenido.push(mensajeaGuardar);
                  
-                console.log(messages)
 
                 let enviarMensaje =  notas.put(messages,data.idchat)
                     enviarMensaje.onsuccess = (e)=>{

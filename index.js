@@ -35,8 +35,6 @@ app.use(express.json())
 
 passport.use(new passportLocal(async function(username,password,done){
     
-    console.log(username)
-    console.log(password)
     const usuarios = await pool.query(`SELECT * FROM usuarios WHERE username = '${username}'` )
     
     if(usuarios.rows.length == 0){
@@ -95,9 +93,7 @@ io.on('connection',async (socket)=>{
     socket.on("guardar", async (data)=>{
         let nomChat;
         let idchat; 
-        console.log(data.usuario)  
-        console.log("espacio")
-        console.log(data.usuario2)
+    
         nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data.usuario}' and 
                                         username2 = '${data.usuario2}'`)
             
@@ -158,10 +154,6 @@ io.on('connection',async (socket)=>{
             }
                                                    
         }
-            
-            // verifico si hay mensaje nuevos 
-            // y  actualizo en el json de  mi computadora 
-            // por ultimo actualizar la barra lateral 
     })
 
     
@@ -182,7 +174,6 @@ io.on('connection',async (socket)=>{
             }
            
             if(contactos.rows[0].username1 == data1.usuario ){  
-                console.log("entra a el primer para modificar message 2")
                 texto = contactos.rows[0].message2
                 texto += `{"usuario": "${data1.usuario}", "texto": "${data1.texto}","fecha":"${fecha.getHours()}"};`
 
@@ -190,8 +181,6 @@ io.on('connection',async (socket)=>{
                                   username1 = '${data1.usuario}'  AND username2 = '${data1.usuario2}'`)
             }
             else{
-                console.log("entra a el primer para modificar message 1")
-                console.log(data1.us)
                 texto = contactos.rows[0].message1
                 texto += `{"usuario": "${data1.usuario}", "texto": "${data1.texto}","fecha":"${fecha.getHours()}"};`
                 await pool.query(`UPDATE contactos SET change1 = '1' , message1 = '${texto}' WHERE 
@@ -274,7 +263,6 @@ app.get('/newcontact/:user', async (req,res)=>{
     session.datos = {
         username :user,
     }
-    console.log(user);
     res.render('chat',{'user': user,'contacto':true,'contactos': 0})
 })
 
@@ -302,7 +290,7 @@ app.post('/signin',async (req,res) =>{
     }
     
     await pool.query(`insert into usuarios (username,password,email,fullname) values('${usuario}','${contraseña}','${correo}','${nombre}')`)
-    console.log("despues del error");
+
     res.render('chat',{'user': usuario,'contacto': false,'contactos':[]})
 })
 

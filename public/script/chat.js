@@ -30,8 +30,36 @@ window.addEventListener("load", (e)=>{
         amigos.push(conversaciones[i].children[1].children[0].textContent.trim())
         conversaciones[i].addEventListener("click",chats)
     }
-    console.log(amigos)
+
+
     socket.emit("datos:server",{amigos:amigos,user:usuarioPri})
+
+    socket.on('guardar:dbLocal',(data)=>{
+        let transaccion = db.transaction(['contactos1'],'readwrite')
+            let  notas = transaccion.objectStore('contactos1')
+             
+            let chatSelecionado =  notas.get(data.idchat)
+
+               chatSelecionado.onsuccess =   (e)=>{
+                let messages = chatSelecionado.result
+
+                let arregloMensajes = data.message.split(";")
+
+               arregloMensajes.map(elements =>{
+
+                   let mensajeTexto = elements
+                    
+                    if(mensajeTexto.length != 0){
+                        mensajeTexto = JSON.parse(mensajeTexto);
+                        messages.contenido.push(mensajeTexto);     
+                    }
+
+                    let enviarMensaje =  notas.put(messages,data.idchat)
+                    enviarMensaje.onsuccess = (e)=>{ }
+                             
+               })         
+            }
+    })
 
     function chats(e){
         
@@ -148,8 +176,6 @@ window.addEventListener("load", (e)=>{
             let data  = await fethEnviar(chat.value)
             // solucionar este erro y verificar que todo funcione; bien 
             // arreglar lo de las dirreciones
-            console.log(data)
-            console.log(usuarioPri)
             data.usuario2 = usuario2
             data.usuario = usuarioPri
             

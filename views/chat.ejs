@@ -11,7 +11,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous"> 
-    <link rel="stylesheet" href="resources/css/chat.css">
+    <link rel="stylesheet" href="/resources/css/chat.css">
     <title>Chatall chat</title>
 </head>
 <body>
@@ -21,7 +21,6 @@
                 <img src="resources/usuario.jpg" alt="" class=userImg>
             </div>
             <div class='userName' >
-              <!--<h3 id="usuario" class="nomUser"><%= username %></h3> --> 
                <h3 id="usuarioPrueba" class="nomUser"><%= user %></h3>
             </div>
         </div>
@@ -43,12 +42,10 @@
        <div class="barra-chats">
             
             <div class="cont-agregar">
-                <div class="agregar">
-                    <!--
-                        eviar informacion por ruta 
-                        pero primero probar si el archivo tiene posibilidad de funcionar en computadores diferentes ;
-                    -->
-                    <p><a href="/newcontact">Agregar Contacto</a></p>
+                <div class="agregar">  
+                    <p>
+                        <a  href="newcontact/<%= user %>" >Agregar Contacto</a>
+                    </p>
                 </div>
                 <!--<div class="ico-agregar">
                     <i class="fas fa-plus"></i> 
@@ -102,7 +99,7 @@
         <div class="cont-title-form">
             <h2>Nuevo contacto</h2>
         </div>
-        <form action="/newcontact" method="POST" >
+        <form action="<%= user %>" method="POST" >
             
             <div class="cont-input">
                 <i class="fas fa-user-plus icono-form"></i>
@@ -116,6 +113,6 @@
     <div>
 <% } %>
 <script src="/socket.io/socket.io.js"></script>
-<script src="resources/script/chat.js"></script>
+<script src="/resources/script/chat.js"></script>
 </body>
 </html>

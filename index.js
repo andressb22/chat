@@ -35,21 +35,26 @@ app.use(express.json())
 
 passport.use(new passportLocal(async function(username,password,done){
     
+    console.log(username)
+    console.log(password)
     const usuarios = await pool.query(`SELECT * FROM usuarios WHERE username = '${username}'` )
     
+    if(usuarios.rows.length == 0){
+        done(null, false, { message: 'Incorrect username.' })
+    }else{
+        session.datos = {
+            username :usuarios.rows[0].username,
+            fullname : usuarios.rows[0].fullname
+        }
+        usuarioPrincipal = usuarios.rows[0]
+        if(usuarios.rows[0].password == password)
+        {
+           return  done(null,usuarios.rows[0])
+        }
     
-    session.datos = {
-        username :usuarios.rows[0].username,
-        fullname : usuarios.rows[0].fullname
+        done(null,false)
     }
-
-    usuarioPrincipal = usuarios.rows[0]
-    if(usuarios.rows[0].password == password)
-    {
-       return  done(null,usuarios.rows[0])
-    }
-
-    done(null,false)
+    
     
 }))
 
@@ -71,8 +76,11 @@ dotenv.config({path:'./env/.env'});
 // express.static se usa para definir la carpera donde estaran los archivos estaticos
 // y app.use es para invocar esa carpeta atraves de el nombre que esta puesto a modo de url
 
-app.use('/resources', express.static('public'))
-app.use('/resources', express.static(__dirname + '/public'))
+//app.use('/resources', express.static('public'))
+app.use('/resources', express.static(path.join(__dirname, 'public')))
+app.use('/resources', express.static(path.join(__dirname, '/public')))
+//app.use('/resources', express.static(__dirname + '/public'))
+
 
 //5) - Establecer el motor de plantillas
 app.set('view engine', 'ejs');
@@ -89,43 +97,48 @@ io.on('connection',async (socket)=>{
         for(let i = 0; i < data.amigos.length; i++){
                  
             let nomChat;
-
+            
             nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data.user}' and 
                                             username2 = '${data.amigos[i]}'`)
                 
             if(nomChat.rows.length == 0){
-
+                console.log("entra en la primera busqueda")
                 nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data.amigos[i]}' and 
                                                username2 = '${data.user}'`);
 
-                let data1 = JSON.stringify(nomChat.rows[0].change2);
-                data1 = parseInt(data1)
-
+                let data1 = nomChat.rows[0].change2;
+                
+                
                 if(data1 == 1){
-
                     let message = JSON.parse(JSON.stringify(nomChat.rows[0].message2))
-                    json.principal.push(message);
+                    console.log(message)
+
+                    socket.emit('guardar:dbLocal', {message:message,
+                                                    idchat:nomChat.rows[0].idchat})
+                    //json.principal.push(message);
 
                     await pool.query(`UPDATE contactos SET change2 = '${0}' , message2 = ' ' WHERE
                                      username1 = '${data.amigos[i]}' AND username2 = '${data.user}'`)
                      }
                      
-                }else{
+            }else{
+                
+                let data1 = nomChat.rows[0].change1;
+                
 
-                    let data1 = JSON.stringify(nomChat.rows[0].change1);
-                    data1 = parseInt(data1)
+                if(data1 == 1){
 
-                    if(data1 == 1){
+                    let message = JSON.parse(JSON.stringify(nomChat.rows[0].message2))
 
-                        let message = JSON.parse(JSON.stringify(nomChat.rows[0].message2))
-                        json.principal.push(message);
+                    console.log(message)
+                    //json.principal.push(message);
 
-                        await pool.query(`UPDATE contactos SET change1 = '${0}' , message1 = ' ' WHERE 
-                                        username1 = '${data.user}' AND username2 = '${data.amigos[i]}'`)
-                     }
+                    await pool.query(`UPDATE contactos SET change1 = '${0}' , message1 = ' ' WHERE 
+                                     username1 = '${data.user}' AND username2 = '${data.amigos[i]}'`)
                 }
-                                                   
             }
+                                                   
+        }
             
             // verifico si hay mensaje nuevos 
             // y  actualizo en el json de  mi computadora 
@@ -152,7 +165,7 @@ io.on('connection',async (socket)=>{
             if(contactos.rows[0].username1 == data1.usuario ){  
             
                 texto = contactos.rows[0].message2
-                texto += `{"usuario": ${data1.usuario}, "texto": ${data1.texto},"fecha":"${fecha.getHours()}"}`
+                texto += `{"usuario": "${data1.usuario}", "texto": "${data1.texto}","fecha":"${fecha.getHours()}"};`
 
                 await pool.query(`UPDATE contactos SET change2 = '1' , message2 = '${texto}' WHERE 
                                   username1 = '${data1.usuario}'  AND username2 = '${data1.usuario2}'`)
@@ -160,7 +173,7 @@ io.on('connection',async (socket)=>{
             else{
                 
                 texto = contactos.rows[0].message1
-                texto += `{"usuario": ${data1.usuario}, "texto": ${data1.texto},"fecha":"${fecha.getHours()}"}`
+                texto += `{"usuario": "${data1.usuario}", "texto": "${data1.texto}","fecha":"${fecha.getHours()}"}`
                 await pool.query(`UPDATE contactos SET change1 = '1' , message1 = '${texto}' WHERE 
                                   username1 = '${data1.usuario}' AND username2 = '${data1.usuario2}'`)
                 
@@ -236,19 +249,25 @@ app.get('/chat',async (req,res,next)=>{
     
 })
 
-app.get('/newcontact', async (req,res)=>{
-    res.render('chat',{'username': session.datos.fullname,'user': session.datos.username,'contacto':true,'contactos': 0})
+app.get('/newcontact/:user', async (req,res)=>{
+    const {user} = req.params
+    session.datos = {
+        username :user,
+    }
+    console.log(user);
+    res.render('chat',{'user': user,'contacto':true,'contactos': 0})
 })
 
-app.post('/newcontact',async (req,res)=>{
+app.post('/newcontact/:user',async (req,res)=>{
     const contact = req.body.newuser
+    const {user} = req.params
     let coverchat ;
 
     const contacto = await pool.query(`SELECT * FROM usuarios WHERE username = '${contact}'`)
-    coverchat =`${session.datos.username}${contacto.rows[0].username}`;
+    coverchat =`${user}${contacto.rows[0].username}`;
 
     await pool.query(`INSERT INTO contactos (username1, username2,idChat,change1,change2,message1,message2) values
-                    ('${session.datos.username}','${contacto.rows[0].username}','${coverchat}','0','0',' ',' ')`)
+                    ('${user}','${contacto.rows[0].username}','${coverchat}','0','0',' ',' ')`)
     
     res.redirect('/chat')
 })
@@ -257,16 +276,14 @@ app.post('/signin',async (req,res) =>{
 
     const {nombre,usuario,correo,contraseña} = req.body;
 
-    const datos ={
-        username:usuario,
-        password:contraseña,
-        email :correo,
-        fullname:nombre
+    session.datos = {
+        username :usuario,
+        fullname : nombre
     }
     
     await pool.query(`insert into usuarios (username,password,email,fullname) values('${usuario}','${contraseña}','${correo}','${nombre}')`)
-    
-    res.render('chat',{'user': datos.username,'contacto': false})
+    console.log("despues del error");
+    res.render('chat',{'user': usuario,'contacto': false,'contactos':[]})
 })
 
 

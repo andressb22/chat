@@ -129,7 +129,8 @@ io.on('connection',async (socket)=>{
                 if(data1 == 1){
 
                     let message = JSON.parse(JSON.stringify(nomChat.rows[0].message2))
-
+                    socket.emit('guardar:dbLocal', {message:message,
+                        idchat:nomChat.rows[0].idchat})
                     console.log(message)
                     //json.principal.push(message);
 

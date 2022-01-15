@@ -160,6 +160,11 @@ window.addEventListener("load", (e)=>{
                 if(nameUser == data.data1.usuario){
 
                 conversaciones[i].children[1].children[1].children[0].innerText = data.data1.texto;
+                socket.emit('guardar',{
+                        texto:data.data1.texto,
+                        usuario:data.data1.usuario,
+                        usuario2: usuarioPri
+                                    })
                 }
             }
             

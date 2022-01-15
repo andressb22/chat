@@ -92,6 +92,29 @@ const io = soketIO(server);
 
 io.on('connection',async (socket)=>{
 
+    socket.on("guardar", async (data)=>{
+        let nomChat;
+        let idchat; 
+        console.log(data.usuario)  
+        console.log("espacio")
+        console.log(data.usuario2)
+        nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data.usuario}' and 
+                                        username2 = '${data.usuario2}'`)
+            
+        if(nomChat.rows.length == 0){
+            nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data.usuario2}' and 
+                                           username2 = '${data.usuario}'`);
+            
+            idchat = nomChat.rows[0].idchat
+        }
+        else{
+            idchat = nomChat.rows[0].idchat 
+        }
+
+        socket.emit('guardar:dbLocal', {message:`{"usuario": "${data.usuario}", "texto": "${data.texto}","fecha":"${fecha.getHours()}"};`,
+                                        idchat:idchat})
+    })
+
     socket.on('datos:server',async(data)=>{
            
         for(let i = 0; i < data.amigos.length; i++){
@@ -102,7 +125,6 @@ io.on('connection',async (socket)=>{
                                             username2 = '${data.amigos[i]}'`)
                 
             if(nomChat.rows.length == 0){
-                console.log("entra en la primera busqueda")
                 nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data.amigos[i]}' and 
                                                username2 = '${data.user}'`);
 
@@ -111,11 +133,9 @@ io.on('connection',async (socket)=>{
                 
                 if(data1 == 1){
                     let message = JSON.parse(JSON.stringify(nomChat.rows[0].message2))
-                    console.log(message)
 
                     socket.emit('guardar:dbLocal', {message:message,
                                                     idchat:nomChat.rows[0].idchat})
-                    //json.principal.push(message);
 
                     await pool.query(`UPDATE contactos SET change2 = '${0}' , message2 = ' ' WHERE
                                      username1 = '${data.amigos[i]}' AND username2 = '${data.user}'`)
@@ -131,8 +151,6 @@ io.on('connection',async (socket)=>{
                     let message = JSON.parse(JSON.stringify(nomChat.rows[0].message1))
                     socket.emit('guardar:dbLocal', {message:message,
                         idchat:nomChat.rows[0].idchat})
-                    console.log(message)
-                    //json.principal.push(message);
 
                     await pool.query(`UPDATE contactos SET change1 = '${0}' , message1 = ' ' WHERE 
                                      username1 = '${data.user}' AND username2 = '${data.amigos[i]}'`)

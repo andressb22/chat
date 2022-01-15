@@ -69,8 +69,11 @@ button{
 }
 .cont-menu{
  display: inline-block;
- 
+ float:right;
  padding: 20px;
+}
+.contenedor-menu{
+    float:right      
 }
 .cont-texto{
     text-align: center;
@@ -91,8 +94,8 @@ button{
     padding: 6px;
 }
 .cont-title-logo{
-    display: grid;
-    grid-template-columns: 95px 1fr;
+    display: inline-flex;
+   
 }
 
 .cont-principal{
@@ -141,8 +144,8 @@ button{
 }
 .menu{
     height: 74px;
-    display: grid;
-    grid-template-columns: 2fr 1fr;      
+    display:grid;
+    grid-template-columns: 1fr 1fr;
 }
 .space-blank{
     

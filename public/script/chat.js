@@ -44,7 +44,7 @@ window.addEventListener("load", (e)=>{
                 let messages = chatSelecionado.result
 
                 let arregloMensajes = data.message.split(";")
-
+                console.log(arregloMensajes)
                arregloMensajes.map(elements =>{
 
                    let mensajeTexto = elements

@@ -128,7 +128,7 @@ io.on('connection',async (socket)=>{
 
                 if(data1 == 1){
 
-                    let message = JSON.parse(JSON.stringify(nomChat.rows[0].message2))
+                    let message = JSON.parse(JSON.stringify(nomChat.rows[0].message1))
                     socket.emit('guardar:dbLocal', {message:message,
                         idchat:nomChat.rows[0].idchat})
                     console.log(message)
@@ -164,7 +164,7 @@ io.on('connection',async (socket)=>{
             }
            
             if(contactos.rows[0].username1 == data1.usuario ){  
-            
+                console.log("entra a el primer para modificar message 2")
                 texto = contactos.rows[0].message2
                 texto += `{"usuario": "${data1.usuario}", "texto": "${data1.texto}","fecha":"${fecha.getHours()}"};`
 
@@ -172,11 +172,12 @@ io.on('connection',async (socket)=>{
                                   username1 = '${data1.usuario}'  AND username2 = '${data1.usuario2}'`)
             }
             else{
-                
+                console.log("entra a el primer para modificar message 1")
+                console.log(data1.us)
                 texto = contactos.rows[0].message1
-                texto += `{"usuario": "${data1.usuario}", "texto": "${data1.texto}","fecha":"${fecha.getHours()}"}`
+                texto += `{"usuario": "${data1.usuario}", "texto": "${data1.texto}","fecha":"${fecha.getHours()}"};`
                 await pool.query(`UPDATE contactos SET change1 = '1' , message1 = '${texto}' WHERE 
-                                  username1 = '${data1.usuario}' AND username2 = '${data1.usuario2}'`)
+                                  username1 = '${data1.usuario2}' AND username2 = '${data1.usuario}'`)
                 
             }
                             // cuando el usuario no esta conectado simplemente debe  guardar los datos en la base de datos 

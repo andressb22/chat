@@ -11,13 +11,12 @@ const cookieParser = require('cookie-parser');
 const passportLocal = require('passport-local').Strategy
 const fs = require('fs');
 
+// en este arreglo se almacenas todos los usuarios que se conectan a travez de socket io
 const clientes = {};
 let usuarioPrincipal ;
 let fecha = new Date;
 
 const app = express();
-
-
 
 app.use(express.urlencoded({extended:true}));
 
@@ -35,6 +34,7 @@ app.use(express.json())
 
 passport.use(new passportLocal(async function(username,password,done){
     
+    // busca en la base de datos si la secion existe 
     const usuarios = await pool.query(`SELECT * FROM usuarios WHERE username = '${username}'` )
     
     if(usuarios.rows.length == 0){
@@ -88,25 +88,29 @@ const server = app.listen(process.env.PORT || 3000, (req,res)=>{})
 
 const io = soketIO(server);
 
+
+async function encontrarDatosDedb(usuario1,usuario2){
+    let datosDeChat;
+    datosDeChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${usuario1}' and 
+        username2 = '${usuario2}'`)
+
+    if(datosDeChat.rows.length == 0){
+        datosDeChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${usuario2}' and 
+                                       username2 = '${usuario1}'`);
+            }
+
+    return datosDeChat
+}
+
+
 io.on('connection',async (socket)=>{
 
     socket.on("guardar", async (data)=>{
-        let nomChat;
-        let idchat; 
-    
-        nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data.usuario}' and 
-                                        username2 = '${data.usuario2}'`)
-            
-        if(nomChat.rows.length == 0){
-            nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data.usuario2}' and 
-                                           username2 = '${data.usuario}'`);
-            
-            idchat = nomChat.rows[0].idchat
-        }
-        else{
-            idchat = nomChat.rows[0].idchat 
-        }
 
+        let datosDeChat = await encontrarDatosDedb(data.usuario,data.usuario2);
+        let idchat = datosDeChat.rows[0].idchat
+
+        //funcion que guarda las conversaciones en el navegador usando indexdb
         socket.emit('guardar:dbLocal', {message:`{"usuario": "${data.usuario}", "texto": "${data.texto}","fecha":"${fecha.getHours()}"};`,
                                         idchat:idchat})
     })
@@ -115,48 +119,37 @@ io.on('connection',async (socket)=>{
            
         for(let i = 0; i < data.amigos.length; i++){
                  
-            let nomChat;
-            
-            nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data.user}' and 
-                                            username2 = '${data.amigos[i]}'`)
+            let datosDeChat = await encontrarDatosDedb(data.user,data.amigos[i]);
+
+                if(datosDeChat.rows[0].username1 == data.user){
+
+                    let data1 = datosDeChat.rows[0].change1;
                 
-            if(nomChat.rows.length == 0){
-                nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data.amigos[i]}' and 
-                                               username2 = '${data.user}'`);
+                    if(data1 == 1){
 
-                let data1 = nomChat.rows[0].change2;
-                
-                
-                if(data1 == 1){
-                    let message = JSON.parse(JSON.stringify(nomChat.rows[0].message2))
+                     let message = JSON.parse(JSON.stringify(datosDeChat.rows[0].message1))
+                        socket.emit('guardar:dbLocal', {message:message,
+                            idchat:datosDeChat.rows[0].idchat})
 
-                    socket.emit('guardar:dbLocal', {message:message,
-                                                    idchat:nomChat.rows[0].idchat})
+                        await pool.query(`UPDATE contactos SET change1 = '${0}' , message1 = ' ' WHERE 
+                                        username1 = '${data.user}' AND username2 = '${data.amigos[i]}'`)
+                    }
+                }else{
 
-                    await pool.query(`UPDATE contactos SET change2 = '${0}' , message2 = ' ' WHERE
-                                     username1 = '${data.amigos[i]}' AND username2 = '${data.user}'`)
-                     }
-                     
-            }else{
-                
-                let data1 = nomChat.rows[0].change1;
-                
+                    let data1 = datosDeChat.rows[0].change2;
+                    
+                    if(data1 == 1){
+                        let message = JSON.parse(JSON.stringify(datosDeChat.rows[0].message2))
 
-                if(data1 == 1){
+                        socket.emit('guardar:dbLocal', {message:message,
+                                                        idchat:datosDeChat.rows[0].idchat})
 
-                    let message = JSON.parse(JSON.stringify(nomChat.rows[0].message1))
-                    socket.emit('guardar:dbLocal', {message:message,
-                        idchat:nomChat.rows[0].idchat})
-
-                    await pool.query(`UPDATE contactos SET change1 = '${0}' , message1 = ' ' WHERE 
-                                     username1 = '${data.user}' AND username2 = '${data.amigos[i]}'`)
-                }
-            }
-                                                   
+                        await pool.query(`UPDATE contactos SET change2 = '${0}' , message2 = ' ' WHERE
+                                        username1 = '${data.amigos[i]}' AND username2 = '${data.user}'`)
+                    }
+                }                                           
         }
     })
-
-    
 
     socket.on('enviar', async (data1)=>{          
 
@@ -164,31 +157,24 @@ io.on('connection',async (socket)=>{
 
         if(clientes[data1.usuario2] == undefined){
             console.log("usuario no conectado ")
-
-            let contactos = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data1.usuario}' and 
-                                              username2 = '${data1.usuario2}'`)
-                                              
-            if(contactos.rows.length == 0){
-                contactos = await pool.query(`SELECT * FROM contactos WHERE username1 = '${data1.usuario2}' and 
-                                              username2 = '${data1.usuario}'`)
-            }
+         
+            let datosDeChat = await encontrarDatosDedb(data1.usuario,data1.usuario2);
            
-            if(contactos.rows[0].username1 == data1.usuario ){  
-                texto = contactos.rows[0].message2
+            if(datosDeChat.rows[0].username1 == data1.usuario ){  
+
+                texto = datosDeChat.rows[0].message2
                 texto += `{"usuario": "${data1.usuario}", "texto": "${data1.texto}","fecha":"${fecha.getHours()}"};`
 
                 await pool.query(`UPDATE contactos SET change2 = '1' , message2 = '${texto}' WHERE 
                                   username1 = '${data1.usuario}'  AND username2 = '${data1.usuario2}'`)
             }
             else{
-                texto = contactos.rows[0].message1
+                texto = datosDeChat.rows[0].message1
                 texto += `{"usuario": "${data1.usuario}", "texto": "${data1.texto}","fecha":"${fecha.getHours()}"};`
                 await pool.query(`UPDATE contactos SET change1 = '1' , message1 = '${texto}' WHERE 
                                   username1 = '${data1.usuario2}' AND username2 = '${data1.usuario}'`)
                 
             }
-                            // cuando el usuario no esta conectado simplemente debe  guardar los datos en la base de datos 
-                            //ademas de esto  planear un escuchador que apenas ingrese verifique los datos 
         }
         else{
 
@@ -244,22 +230,21 @@ app.get('/chat',async (req,res,next)=>{
     req.session.usuario = usuarioPrincipal.username;
     req.session.contraseña = usuarioPrincipal.password;
     
-    const contactos = await pool.query(`SELECT * FROM contactos WHERE username1 = '${session.datos.username}'
+    const encontrarContactos = await pool.query(`SELECT * FROM contactos WHERE username1 = '${session.datos.username}'
                                          or username2 = '${session.datos.username}'`);
 
    
     res.render('chat',{
-                        'username': session.datos.fullname,
                         'user':session.datos.username,
                         'contacto':false,
-                        'contactos':contactos.rows
-                        
+                        'contactos':encontrarContactos.rows 
                       })
     
 })
 
 app.get('/newcontact/:user', async (req,res)=>{
     const {user} = req.params
+
     session.datos = {
         username :user,
     }
@@ -283,7 +268,7 @@ app.post('/newcontact/:user',async (req,res)=>{
 app.post('/signin',async (req,res) =>{
 
     const {nombre,usuario,correo,contraseña} = req.body;
-
+    
     session.datos = {
         username :usuario,
         fullname : nombre
@@ -300,38 +285,25 @@ app.post('/login',passport.authenticate('local',{
     failureRedirect:'/'
 }))
 
+
+//estos dos metodos son los encargador de prosesar los fetch para encontrar el contenido y mostrarlo en pantalla
+
+
 app.post('/encontrar',async (req,res)=>{
 
-    let nomChat;
-
-    nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${req.body.usuarioPri}' and
-                                 username2 = '${req.body.usuario}'`)
-
-    if(nomChat.rows.length == 0){
-        nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${req.body.usuario}' and
-                                    username2 = '${req.body.usuarioPri}'`);
-    }
-     
-    let id = {"idchat":nomChat.rows[0].idchat}
+    let datosDeChat = await encontrarDatosDedb(req.body.usuarioPri,req.body.usuario);  
+    let id = {"idchat":datosDeChat.rows[0].idchat}
     
     return res.send(id)
 })
 
 app.post('/enviar',async(req,res)=>{
-
-    let nomChat;
     
-    nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${req.body.usuarioPri}' and
-                               username2 = '${req.body.usuario}'`)
-
-    if(nomChat.rows.length == 0){
-        nomChat = await pool.query(`SELECT * FROM contactos WHERE username1 = '${req.body.usuario}' and 
-                                   username2 = '${req.body.usuarioPri}'`);
-    }
-
-    let id = {"idchat":nomChat.rows[0].idchat,
+    let datosDeChat = await encontrarDatosDedb(req.body.usuarioPri,req.body.usuario);
+    let id = {"idchat":datosDeChat.rows[0].idchat,
               "texto":req.body.texto,
               }
+
     return res.send(id)
 })
 

@@ -47,10 +47,9 @@ button{
 
 .celular{
     height: 450px;
-    width: 35vw;
+    width: 34.4vw;
+    padding-left: 15%;
     transform: rotate(25deg);
-    padding: 0px;
-    padding-left: 23%;
     filter: drop-shadow(3px 12px 10px rgb(0, 0, 0));
     
 }
@@ -62,6 +61,7 @@ button{
     padding: 30px 30px 40px 30px;
 }
 .cont-input{
+    display: block;
     padding: 7px 20px;
 }
 .cont-logo{
@@ -104,13 +104,14 @@ button{
 }
 .fon-celular{  
     height: 400px;
-    width: 14vw;
+    width: 13.7vw;
     transform: rotate(25deg);
-    padding: 30px;
-    padding-left: 9%;      
+    padding-top: 30px;
+    /*padding: 30px;*/
+    padding-left: 6.7%;     
     position: absolute;
-    left: 63%;
-    top:80px;  
+    left: 61.8%;
+    top:74px;  
     z-index: -3;
 
 }
@@ -118,12 +119,12 @@ button{
     position: relative;
     color: #6A00AB;
     font-size: 24px;
-    top:30px;
+    top: 2rem;
     left:86%;
 }
 .input{
-    width: 28vw;
-    height: 35px;
+    width: 29vw;
+    height: 40px;
     border: none;
     border-bottom: 2px solid #6A00AB;
     font-size: 18px;
@@ -158,6 +159,81 @@ button{
     left: 0;
     z-index: -30;
     opacity: 0;
+}
+
+
+@media (max-width:1200px){
+    .celular{
+        height: 400px;
+        width: 34.4vw;
+        padding-left: 15%;
+        transform: rotate(25deg);
+        filter: drop-shadow(3px 12px 10px rgb(0, 0, 0));
+        
+    }
+    .fon-celular{  
+        height: 358px;
+        width: 13.6vw;
+        transform: rotate(25deg);
+        padding-top: 25px;
+        /*padding: 30px;*/
+        padding-left: 6.4%;     
+        position: absolute;
+        left: 61.8%;
+        top:74px;  
+        z-index: -3;
+    
+    }
+    .textoPri{
+        font-size: 40px;
+        color: #310063;
+        font-weight: 900;
+        
+    }
+}
+
+@media (max-width:860px){
+    .celular{
+        height: 300px;
+        width: 34.4vw;
+        padding-top: 26px;
+        padding-left: 15%;
+        transform: rotate(25deg);
+        filter: drop-shadow(3px 12px 10px rgb(0, 0, 0));
+        
+    }
+    .fon-celular{  
+        height: 267px;
+        width: 13.5vw;
+        transform: rotate(25deg);
+        padding-top: 42px;
+        /*padding: 30px;*/
+        padding-left: 6.8%;     
+        position: absolute;
+        left: 61.8%;
+        top:74px;  
+        z-index: -3;
+    
+    }
+    .textoPri{
+        font-size: 34px;
+        color: #310063;
+        font-weight: 900;
+        
+    }
+    .cont-menu{
+        display: inline-block;
+        float:right;
+        padding: 10px;
+       }
+    .input{
+        width: 27vw;
+        height: 40px;
+        border: none;
+        border-bottom: 2px solid #6A00AB;
+        font-size: 12px;
+        padding-left: 5px;
+    }
 }
 
 

@@ -6,6 +6,8 @@ window.addEventListener("load", (e)=>{
     const usuarioPri = document.querySelector('#usuarioPrueba').textContent
     const contChat = document.querySelector('#cont-chat');
     const contenedorChat = document.querySelector('#cont-chat');
+    const botonAudio = document.querySelector('#botonAudio'); 
+    const enviarAudio = document.querySelector('#enviarAudio')
     const socket = io();
     let usuario2 ;
     let amigos = []

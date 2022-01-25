@@ -327,7 +327,7 @@ window.addEventListener("load", (e)=>{
         contenedorChat.scrollTop = contenedorChat.scrollHeight;
     }
 
-     function crearAudios(response,direccion = undefined){
+     async function crearAudios(response,direccion = undefined){
         let elementoDeAudio = document.createElement("audio")
         let elementoContenedor = document.createElement("div")
         let contenedorbtnAudio = document.createElement("div")
@@ -361,6 +361,7 @@ window.addEventListener("load", (e)=>{
         elementoDeAudio.currentTime = 3600;
     
         elementoDeAudio.onloadeddata = function(e){
+            elementoDeAudio.currentTime = 3600;
             let tiempo = actualizarTiempo(elementoDeAudio.currentTime,elementoDeAudio.duration);
             tiempoAudio.innerText = tiempo;
             elementoDeAudio.currentTime = 0;

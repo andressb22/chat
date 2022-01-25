@@ -43,7 +43,6 @@ window.addEventListener("load", (e)=>{
     
     socket.on('guardar:dbLocal',(data)=>{
 
-        console.log(data.message);
         let transaccion = db.transaction(['contactos1'],'readwrite')
         let  notas = transaccion.objectStore('contactos1')
              
@@ -51,7 +50,7 @@ window.addEventListener("load", (e)=>{
 
 
          chatSelecionado.onsuccess =   (e)=>{
-            let   = chatSelecionado.result
+            let messages = chatSelecionado.result
             if(messages == undefined){
   
                 let chat = {
@@ -83,13 +82,13 @@ window.addEventListener("load", (e)=>{
                 }             
             }
             else{
-                let arregloMensajes = data.message.split(";")
+                let arregloMensajes = data.message.split(";!")
                 arregloMensajes.map(elements =>{
 
                     let mensajeTexto = elements
                          
-                    if(mensajeTexto.length != 0){
-
+                    if(mensajeTexto.length != 0){  
+                        
                         mensajeTexto = JSON.parse(mensajeTexto);
                         messages.contenido.push(mensajeTexto);         
                     }
@@ -128,15 +127,12 @@ window.addEventListener("load", (e)=>{
                 if(data1 != undefined){
                     let direccion = 0;
                     data1.contenido.map(async (elements) =>{
-                        try{
-                            elements.texto = JSON.parse(elements.texto) 
+                        if(typeof elements.texto == "object"){
                             elements.usuario != usuarioPri? direccion = 1 : direccion = 0;
-                            console.log(direccion)
                             crearAudios(elements.texto[0],direccion)
-                            return;
-                        }catch(e){}
+                            return; 
+                        } 
 
-                        
                         elements.usuario != usuarioPri?direccion = 1 : direccion = 0;
                         crearMensajeTexto(elements.texto,direccion) 
                     })
@@ -167,8 +163,13 @@ window.addEventListener("load", (e)=>{
                 let nameUser = conversaciones[i].children[1].children[0].textContent.trim() 
 
                 if(nameUser == data.data1.usuario){
-
-                conversaciones[i].children[1].children[1].children[0].innerText = data.data1.texto;
+                if(typeof data.data1.texto == "object"){
+                    conversaciones[i].children[1].children[1].children[0].innerText = "audio"; 
+                }
+                else{
+                    conversaciones[i].children[1].children[1].children[0].innerText = data.data1.texto;
+                }
+                
                 socket.emit('guardar',{
                         texto:data.data1.texto,
                         usuario:data.data1.usuario,
@@ -230,13 +231,11 @@ window.addEventListener("load", (e)=>{
                  
 
                 let enviarMensaje =  notas.put(messages,data.idchat)
-                    enviarMensaje.onsuccess = async (e)=>{                        
-                        try{
-                            data.texto = JSON.parse(data.texto) 
-                            crearAudios(data.texto[0],direccion)
-                            return;
-                        }catch(e){}
-                        
+                    enviarMensaje.onsuccess = async (e)=>{    
+                        if(typeof data.texto == "object"){
+                            await crearAudios(data.texto[0],direccion)
+                            return; 
+                        }                    
                         crearMensajeTexto(data.texto,direccion)
                         
                     }
@@ -264,7 +263,6 @@ window.addEventListener("load", (e)=>{
             mediaRecorder.start();
 
             mediaRecorder.ondataavailable = function(e){
-                console.log(e.data);
                 chunks.push(e.data);
             }
     
@@ -272,16 +270,12 @@ window.addEventListener("load", (e)=>{
                 alert("audio finalizado")
     
                 let blob = new Blob(chunks,{type:"audio/mpeg"});
-                console.log(chunks);
                 chunks = [];
-                console.log(blob);                  
+                              
     
                 const base64String = await convertBlobToBase64(blob);
 
-                console.log(base64String)
-               
                 let data  = await fethEnviar(base64String)
-                data.texto = JSON.stringify(data.texto)
                 data.usuario2 = usuario2
                 data.usuario = usuarioPri
                 socket.emit('enviar', data)   
@@ -330,7 +324,7 @@ window.addEventListener("load", (e)=>{
         contenedorChat.scrollTop = contenedorChat.scrollHeight;
     }
 
-    async function crearAudios(response,direccion = undefined){
+     function crearAudios(response,direccion = undefined){
         let elementoDeAudio = document.createElement("audio")
         let elementoContenedor = document.createElement("div")
         let contenedorbtnAudio = document.createElement("div")

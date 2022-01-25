@@ -106,13 +106,21 @@ async function encontrarDatosDedb(usuario1,usuario2){
 io.on('connection',async (socket)=>{
 
     socket.on("guardar", async (data)=>{
-
+        
+        let datosMensaje ;
+        if(typeof data.texto =="object"){
+            datosMensaje ={message:`{"usuario": "${data.usuario}", "texto": ${JSON.stringify(data.texto)},"fecha":"${fecha.getHours()}"};!`,
+            idchat:idchat} 
+        }
+        else{
+            datosMensaje ={message:`{"usuario": "${data.usuario}", "texto": "${data.texto}","fecha":"${fecha.getHours()}"};!`,
+                                        idchat:idchat}
+        }
         let datosDeChat = await encontrarDatosDedb(data.usuario,data.usuario2);
         let idchat = datosDeChat.rows[0].idchat
 
         //funcion que guarda las conversaciones en el navegador usando indexdb
-        socket.emit('guardar:dbLocal', {message:`{"usuario": "${data.usuario}", "texto": "${data.texto}","fecha":"${fecha.getHours()}"};`,
-                                        idchat:idchat})
+        socket.emit('guardar:dbLocal',datosMensaje);
     })
 
     socket.on('datos:server',async(data)=>{
@@ -128,7 +136,6 @@ io.on('connection',async (socket)=>{
                     if(data1 == 1){
 
                      let message = JSON.parse(JSON.stringify(datosDeChat.rows[0].message1))
-                     console.log(message)
                         socket.emit('guardar:dbLocal', {message:message,
                             idchat:datosDeChat.rows[0].idchat})
 
@@ -141,7 +148,6 @@ io.on('connection',async (socket)=>{
                     
                     if(data1 == 1){
                         let message = JSON.parse(JSON.stringify(datosDeChat.rows[0].message2))
-                        console.log(message)
                         socket.emit('guardar:dbLocal', {message:message,
                                                         idchat:datosDeChat.rows[0].idchat})
 
@@ -162,16 +168,27 @@ io.on('connection',async (socket)=>{
             let datosDeChat = await encontrarDatosDedb(data1.usuario,data1.usuario2);
            
             if(datosDeChat.rows[0].username1 == data1.usuario ){     
-
                 texto = datosDeChat.rows[0].message2
-                texto += `{"usuario": "${data1.usuario}", "texto": "${data1.texto}","fecha":"${fecha.getHours()}"};`
+                if(typeof data1.texto == "object"){
+                    texto += `{"usuario": "${data1.usuario}", "texto": ${JSON.stringify(data1.texto)},"fecha":"${fecha.getHours()}"};!`
+                }
+                else{
+                    texto += `{"usuario": "${data1.usuario}", "texto": "${data1.texto}","fecha":"${fecha.getHours()}"};!`
+                }
+               
 
                 await pool.query(`UPDATE contactos SET change2 = '1' , message2 = '${texto}' WHERE 
                                   username1 = '${data1.usuario}'  AND username2 = '${data1.usuario2}'`)
             }
             else{
                 texto = datosDeChat.rows[0].message1
-                texto += `{"usuario": "${data1.usuario}", "texto": "${data1.texto}","fecha":"${fecha.getHours()}"};`
+                if(typeof data1.texto == "object"){
+                    texto += `{"usuario": "${data1.usuario}", "texto": ${JSON.stringify(data1.texto)},"fecha":"${fecha.getHours()}"};!`
+                }
+                else{
+                    texto += `{"usuario": "${data1.usuario}", "texto": "${data1.texto}","fecha":"${fecha.getHours()}"};!`
+                }
+                
                 await pool.query(`UPDATE contactos SET change1 = '1' , message1 = '${texto}' WHERE 
                                   username1 = '${data1.usuario2}' AND username2 = '${data1.usuario}'`)
                 

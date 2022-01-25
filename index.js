@@ -106,7 +106,8 @@ async function encontrarDatosDedb(usuario1,usuario2){
 io.on('connection',async (socket)=>{
 
     socket.on("guardar", async (data)=>{
-        
+        let datosDeChat = await encontrarDatosDedb(data.usuario,data.usuario2);
+        let idchat = datosDeChat.rows[0].idchat
         let datosMensaje ;
         if(typeof data.texto =="object"){
             datosMensaje ={message:`{"usuario": "${data.usuario}", "texto": ${JSON.stringify(data.texto)},"fecha":"${fecha.getHours()}"};!`,
@@ -116,8 +117,8 @@ io.on('connection',async (socket)=>{
             datosMensaje ={message:`{"usuario": "${data.usuario}", "texto": "${data.texto}","fecha":"${fecha.getHours()}"};!`,
                                         idchat:idchat}
         }
-        let datosDeChat = await encontrarDatosDedb(data.usuario,data.usuario2);
-        let idchat = datosDeChat.rows[0].idchat
+        
+        
 
         //funcion que guarda las conversaciones en el navegador usando indexdb
         socket.emit('guardar:dbLocal',datosMensaje);

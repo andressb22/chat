@@ -74,7 +74,7 @@
        </div>
        <div class="cont-chat">
            <div class="chat" id="cont-chat">
-                
+                <audio id="audio"></audio>
            </div>
            <div class="barra-chat">
                <div>
@@ -85,14 +85,69 @@
                     <!--<input type="submit" value=">">      -->     
                </div>
                <div >
-                    <i class="fas fa-laugh iconos-chat"></i>
+                    <i class="fas fa-laugh iconos-chat" id="emojis"></i>
                     <i class="fas fa-microphone iconos-chat" id="botonAudio"></i>
                     <i class="fas fa-location-arrow iconos-chat" id="enviarAudio"></i>
                </div>
            </div>
        </div>
    </div>
+   <div class="ContEmojis" id="contenedorEmojis">
 
+       <div class="cont-emoji"><span class="emoji"> &#128513</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128512</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128518</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128514</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#129299</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#129300</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128517</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128521</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128523</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128520</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128527</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128526</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128525</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#129321</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128528</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128530</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128543</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128542</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128532</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128531</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128546</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128534</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128557</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128533</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128535</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128536</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128539</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128540</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128541</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128544</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128545</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128553</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128556</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128558</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128559</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128561</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128563</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128564</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128567</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#129318</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128584</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128585</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128586</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128169</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128169</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128591</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128147</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128148</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128156</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128170</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128077</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128075</span></div>
+       <div class="cont-emoji"><span class="emoji"> &#128079</span></div>
+   </div>
    <% if (contacto) { %>
 
     <!--verficar que esto funcione con el req.session -->
@@ -115,5 +170,6 @@
 <% } %>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/resources/script/chat.js"></script>
+<script src="/resources/script/emojis.js"></script>
 </body>
 </html>

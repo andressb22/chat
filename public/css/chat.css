@@ -36,7 +36,7 @@ header{
 }
 .barra-chats{
     border-right: 1px solid rgba(128, 128, 128, 0.582);
-    max-height: 100vh;
+    max-height:88.9vh;
     overflow-y: scroll;
 }
 .boton-form{
@@ -54,7 +54,7 @@ header{
 .chat{
     background-image: url('../fondo-tel.jpg');
     background-size: contain ;
-    
+    height: 100%;
 }
 .config{
     border-left: 2px solid grey;
@@ -71,7 +71,7 @@ header{
 .cont-chat{
     display: grid;
     grid-template-rows: 6.5fr 1fr;
-    height: 100%;
+    height: 88.9vh;
     max-height: 100vh;
 }
 .cont-input{
@@ -106,17 +106,17 @@ header{
     display: grid;
     grid-template-columns: 1fr 3.3fr;
     grid-template-rows: 1fr;
-    max-height: 100%;
+    max-height:88.9vh;
     margin-bottom: 1px solid grey;
 }
 .cont-mensaje{
-    display: inline-block;
+    display: inline-flex;
     margin: 20px;
     border-radius: 8px;
     padding: 20px;
     text-align: left;
-    background-color: rgb(0, 63, 99);
-    max-width: 85vh;
+    background-color: #b1e8d0;
+    max-width: 550px;
     align-self: flex-end;
 }
 .cont-mensaje-left{    
@@ -125,8 +125,8 @@ header{
     border-radius: 8px;
     padding: 20px;
     text-align: left;
-    max-width: 85vh;
-    background-color: rgb(0, 63, 99);
+    max-width: 650px;
+    background-color: #bd87bb;
     align-self: flex-start;
     
 }
@@ -209,11 +209,118 @@ header{
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
-    max-height: 77vh;
+    /*height: 75vh;*/
+    max-height: 82vh;
 }
 
 #enviarAudio{
     display: none;
     transform: rotate(45deg);
     font-size: 28px;
+}
+audio{
+    height: 30px;
+}
+
+.iconoAudio{
+    display: inline-block; 
+    width: 30px;
+    height: 30px;
+    color:rgb(75, 75, 75) ;
+}
+.contenedor-audio{
+    display: inline-block;
+    padding-top: 8px;
+}
+.contenedor-barraAudio{
+    padding-top: 5px;
+    display: inline-block;
+}
+.tiempoAudio{
+    display: inline-block;
+    padding: 6px 8px;
+}
+.ContEmojis{
+    display:none;
+    position: absolute;
+    top:300px;
+    left:350px;
+    padding: 15px;
+    border-radius: 12px;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    cursor: pointer;
+    background: #FFFFFF;
+    
+}
+.ContEmojis::after{
+    content: "";
+
+    display: inline-block;
+    position: relative;
+    width: 0; 
+    height: 0; 
+    border-right: 30px solid #ffffff;
+    border-top: 20px solid #ffffff00;
+    border-bottom: 20px solid #ffffff00; 
+    border-left: 1px solid #ffffff00;
+    border-radius: 12px;
+    top:35px;
+
+    left:97px;
+
+}
+.cont-emoji{
+    display: inline-block;
+    padding: 5px;
+    align-items: center;
+    text-align: center;
+    border-radius: 6px;
+}
+.cont-emoji:hover{
+background: #e0e0e0;
+
+}
+.emoji{
+    font-size: 20px;
+    text-align: center;
+}
+
+input[type=range] {
+   
+    -webkit-appearance: none;
+    appearance: none;
+    display: inline-block;
+    width: 200px;
+    height: 0.5em;
+    border-radius: 5px;
+    background: linear-gradient(90deg,rgb(75, 75, 75) 60%,rgb(236, 236, 236) 60%);
+    outline: none;
+}
+
+/* para o Fire Fox */
+#rango::-moz-range-thumb {
+width: 25px;
+height: 25px;
+border-radius: 50%;
+background: rgb(75, 75, 75);
+border: none;
+}
+
+/* para browsers da MS */
+#rango::-ms-range-thumb {
+width: 25px;
+height: 25px;
+border-radius: 50%;
+background: rgb(75, 75, 75);
+border: none;
+}
+#rango::-webkit-slider-thumb{
+
+/* all:unset; /* limpa os estilos iniciais */
+-webkit-appearance: none; /* remove a aparencia padão */
+border: none;
+width: 15px;
+height: 15px;
+border-radius: 50%;
+background: rgb(75, 75, 75);
 }

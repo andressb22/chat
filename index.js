@@ -160,7 +160,7 @@ io.on('connection',async (socket)=>{
          
             let datosDeChat = await encontrarDatosDedb(data1.usuario,data1.usuario2);
            
-            if(datosDeChat.rows[0].username1 == data1.usuario ){  
+            if(datosDeChat.rows[0].username1 == data1.usuario ){     
 
                 texto = datosDeChat.rows[0].message2
                 texto += `{"usuario": "${data1.usuario}", "texto": "${data1.texto}","fecha":"${fecha.getHours()}"};`

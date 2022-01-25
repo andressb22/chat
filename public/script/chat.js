@@ -210,9 +210,7 @@ window.addEventListener("load", (e)=>{
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({usuario:usuario2,
-                                texto:texto,
                                 usuarioPri:usuarioPri,
-                                direccion : direccion
                                 })
         })
         .then(res =>{return res.json()})
@@ -227,7 +225,7 @@ window.addEventListener("load", (e)=>{
                 let messages = chatSelecionado.result
 
                 let mensajeaGuardar = {
-                    texto:data.texto,
+                    texto:texto,
                     fecha:fecha.getHours(),
                     usuario: usuarioPri 
                 }
@@ -236,14 +234,15 @@ window.addEventListener("load", (e)=>{
 
                 let enviarMensaje =  notas.put(messages,data.idchat)
                     enviarMensaje.onsuccess = async (e)=>{    
-                        if(typeof data.texto == "object"){
-                            await crearAudios(data.texto[0],direccion)
+                        if(typeof texto == "object"){
+                            await crearAudios(texto[0],direccion)
                             return; 
                         }                    
-                        crearMensajeTexto(data.texto,direccion)
+                        crearMensajeTexto(texto,direccion)
                         
                     }
              }
+             data.texto = texto;
              message = data ;  
         })
          return message

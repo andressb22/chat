@@ -319,9 +319,7 @@ app.post('/encontrar',async (req,res)=>{
 app.post('/enviar',async(req,res)=>{
     
     let datosDeChat = await encontrarDatosDedb(req.body.usuarioPri,req.body.usuario);
-    let id = {"idchat":datosDeChat.rows[0].idchat,
-              "texto":req.body.texto,
-              }
+    let id = {"idchat":datosDeChat.rows[0].idchat}
 
     return res.send(id)
 })

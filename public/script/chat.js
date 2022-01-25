@@ -42,6 +42,8 @@ window.addEventListener("load", (e)=>{
     socket.emit("datos:server",{amigos:amigos,user:usuarioPri})
     
     socket.on('guardar:dbLocal',(data)=>{
+
+        console.log(data.message);
         let transaccion = db.transaction(['contactos1'],'readwrite')
         let  notas = transaccion.objectStore('contactos1')
              
@@ -136,7 +138,7 @@ window.addEventListener("load", (e)=>{
 
                         
                         elements.usuario != usuarioPri?direccion = 1 : direccion = 0;
-                        crearMensajeTexto(elements.texto,direccion)
+                        crearMensajeTexto(elements.texto,direccion) 
                     })
                 }
                 else{

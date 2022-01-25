@@ -128,6 +128,7 @@ io.on('connection',async (socket)=>{
                     if(data1 == 1){
 
                      let message = JSON.parse(JSON.stringify(datosDeChat.rows[0].message1))
+                     console.log(message)
                         socket.emit('guardar:dbLocal', {message:message,
                             idchat:datosDeChat.rows[0].idchat})
 
@@ -140,7 +141,7 @@ io.on('connection',async (socket)=>{
                     
                     if(data1 == 1){
                         let message = JSON.parse(JSON.stringify(datosDeChat.rows[0].message2))
-
+                        console.log(message)
                         socket.emit('guardar:dbLocal', {message:message,
                                                         idchat:datosDeChat.rows[0].idchat})
 

@@ -356,7 +356,7 @@ window.addEventListener("load", (e)=>{
         elementoContenedor.appendChild(elementoDeAudio);
 
         elementoDeAudio.src = `${response}`
-            
+        elementoContenedor.preload = "metadata"   
         contenedorbtnAudio.addEventListener("click",reanudarYpausar)
         elementoDeAudio.currentTime = 3600;
     

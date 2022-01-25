@@ -66,14 +66,18 @@ window.addEventListener("load", (e)=>{
                     rescatarDatos.onsuccess =   (e)=>{
 
                         let mensajeRescatado = rescatarDatos.result
-                        let RescatarArregloMensajes = data.message.split(";")
+                        let RescatarArregloMensajes = data.message.split(";!")
                         RescatarArregloMensajes.map(elements =>{
 
                             let mensajeTexto = elements
                          
                             if(mensajeTexto.length != 0){
-                                mensajeTexto = JSON.parse(mensajeTexto);
-                                mensajeRescatado.contenido.push(mensajeTexto);         
+                                console.log(elements)
+                                if(typeof mensajeTexto.texto != "object"){
+                                    mensajeTexto = JSON.parse(mensajeTexto);
+                                }
+                                
+                                mensajeRescatado.contenido.push(mensajeTexto);        
                             }                                  
                         }) 
 
@@ -153,7 +157,7 @@ window.addEventListener("load", (e)=>{
         
         if( usuario2 == data.data1.usuario){
             
-            await fethEnviar(data.data1.texto,1)
+            await fethEnviar(data.data1.texto,1) 
             contenedorChat.scrollTop = contenedorChat.scrollHeight;
         }
         else if(usuario2 == null || usuario2 != data.usuario || usuario2 == undefined){

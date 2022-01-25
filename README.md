@@ -3,7 +3,8 @@ chat simple creado con javascript y nodejs
 
 
 
-el repositorio no funcionara ya que no tiene el archivo de base de datos subido por lo tanto si se desea utilizar el repositorio se debe usar la estructura de la base de datos o cambiarla
+el repositorio no tiene el archivo de conexion a la base de datos subido por lo tanto si se desea utilizar el repositorio se debe usar la estructura de la base de datos o cambiarla.
+
 la estructura es la siguiente:
 
 table usuarios(
